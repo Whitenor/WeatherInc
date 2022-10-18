@@ -2,7 +2,7 @@
     /* 
     Plugin Name: Weather Inc
     Plugin URI: a-piron.fr
-    Desription: Ce plugin a pour but d'intégrer une météo heure par heure à votre site
+    Description: Ce plugin a pour but d'intégrer une météo heure par heure à votre site
     Version: 1.0
     Author: Antoine Piron
     Author URI: a-piron.fr
@@ -23,7 +23,7 @@
     }
 
 
-    function test(){
+    function init_weather_inc(){
         $new_page = array(
             'slug' => 'blog',
             'title' => 'Blog',
@@ -42,10 +42,13 @@
         ));
     };
     function test2(){
-        $query =  connect()->prepare('SELECT ID FROM '.$table_prefix.'_posts WHERE post_title = :test');
-        $query->bindParam(':test', 'Blog');
+        $test = 'Blog';
+        $query = connect()->prepare('SELECT ID FROM plugin_posts WHERE post_title = :toFind');
+        $query->bindParam(':toFind', $test);
+        $query->execute();
+        // $query->execute(array('Blog'));
         $toDel = $query->fetch;
         wp_delete_post($toDel['ID']);
     }
-    add_action('activated_plugin', 'test');
+    add_action('activated_plugin', 'init_weather_inc');
     add_action('deactivate_plugin', 'test2');
