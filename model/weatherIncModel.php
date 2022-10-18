@@ -1,7 +1,7 @@
 <?php 
 
 class WeatherInc{
-    function connect(){
+    private function connect(){
         require_once(ABSPATH . 'wp-config.php');
         $sql = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME,DB_USER, DB_PASSWORD);
         return $sql;
@@ -28,6 +28,11 @@ class WeatherInc{
             ));
         }
         $this->createTable();
+        $results = json_decode($this->cURLCommunes(), true);
+        foreach ($results as $result) {
+            $query = $this->connect()->prepare('INSERT INTO communes (code, nom) VALUES (?,?)');
+            $query->execute(array($result['code'], $result['nom']));
+        }
     }
 
     public function uninit_weather_incModel(){
@@ -56,13 +61,16 @@ class WeatherInc{
     }
     
     private function createTable(){
-        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6),shortcode VARCHAR(30),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6),code INT(6),nom VARCHAR(30),PRIMARY KEY(id));');
+        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6) AUTO_INCREMENT,shortcode VARCHAR(30),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6) AUTO_INCREMENT,code INT(6),nom VARCHAR(30),PRIMARY KEY(id));');
         $query->execute();
     }
     private function cURLCommunes(){
         $curl = curl_init();
         $url = 'https://geo.api.gouv.fr/communes';
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        return curl_exec($curl);
+        curl_close($curl);
     }
 }
