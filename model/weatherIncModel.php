@@ -9,7 +9,7 @@ class WeatherInc{
 
 
     public function init_weather_incModel(){
-        if ($this->checkExistant() == false) {
+        if ($this->checkPageExistant() == false) {
             $new_page = array(
                 'slug' => 'wheaterinc',
                 'title' => 'WheatherInc',
@@ -27,21 +27,7 @@ class WeatherInc{
                 'menu_order' => 0
             ));
         }
-        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6),shortcode VARCHAR(30),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6),code INT(6),nom VARCHAR(30),PRIMARY KEY(id));');
-        $query->execute();
-    }
-
-    private function checkExistant(){
-        $query = $this->connect()->prepare('SELECT * FROM plugin_posts WHERE post_title = WeatherInc');
-        $query->execute();
-        $toCheck = $query->fetchAll();
-        $check = count($toCheck);
-        if ($check > 0) {
-            return true;
-        }
-        else{
-            return false;
-        }
+        $this->createTable();
     }
 
     public function uninit_weather_incModel(){
@@ -54,5 +40,29 @@ class WeatherInc{
 
         $query = $this->connect()->prepare('DROP TABLE communes, shortcode; ');
         $query->execute();
+    }
+
+    private function checkPageExistant(){
+        $query = $this->connect()->prepare('SELECT * FROM plugin_posts WHERE post_title = WeatherInc');
+        $query->execute();
+        $toCheck = $query->fetchAll();
+        $check = count($toCheck);
+        if ($check > 0) {
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    private function createTable(){
+        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6),shortcode VARCHAR(30),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6),code INT(6),nom VARCHAR(30),PRIMARY KEY(id));');
+        $query->execute();
+    }
+    private function cURLCommunes(){
+        $curl = curl_init();
+        $url = 'https://geo.api.gouv.fr/communes';
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_URL, $url);
     }
 }
