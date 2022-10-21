@@ -73,4 +73,11 @@ class WeatherInc{
         return curl_exec($curl);
         curl_close($curl);
     }
+    private function adminPage(){
+        ?>
+		<h1>
+			Ceci est un test
+		</h1>
+	<?php
+    }
 }

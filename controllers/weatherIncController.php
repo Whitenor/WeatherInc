@@ -13,5 +13,19 @@
         $toCall = new WeatherInc;
         $toCall->uninit_weather_incModel();
     }
-    add_action('activated_plugin', 'init_weather_inc');
+    function test(){
+        add_menu_page( 'WeatherInc', 'Administration de WeatherInc', 'administrator', 'WeatherIncAdmin', 'adminPage', 'dashicons-cloud', 8 );
+    }
+    function adminPage(){
+        ?>
+		<h1>
+			Ceci est un test
+		</h1>
+	<?php
+    }
+    function test2(){
+        add_action( 'admin_menu', 'test' );
+    }
+    // add_action('activated_plugin', 'init_weather_inc'); //lui c'est bon
+    add_action('activated_plugin', 'test2');
     add_action('deactivate_plugin', 'uninit_weather_inc');
