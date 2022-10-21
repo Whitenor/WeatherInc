@@ -34,7 +34,6 @@ class WeatherInc{
             $query->execute(array($result['code'], $result['nom']));
         }
     }
-
     public function uninit_weather_incModel(){
         $query = $this->connect()->prepare('SELECT ID FROM plugin_posts WHERE post_title = ?');
         $query->execute(array('WheatherInc'));
@@ -72,12 +71,5 @@ class WeatherInc{
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         return curl_exec($curl);
         curl_close($curl);
-    }
-    private function adminPage(){
-        ?>
-		<h1>
-			Ceci est un test
-		</h1>
-	<?php
     }
 }
