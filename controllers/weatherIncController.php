@@ -19,6 +19,9 @@
     function thePage(){
         require(plugin_dir_path( __FILE__ )."../views/viewWeatherInc.php");
     }
-    add_action('activated_plugin', 'init_weather_inc'); //lui c'est bon
+    if (isset($_POST['apiKey'])) {
+        
+    }
+    add_action('activated_plugin', 'init_weather_inc');
     add_action('admin_menu', 'newAdminPage');
     add_action('deactivate_plugin', 'uninit_weather_inc');

@@ -8,7 +8,6 @@
     Author URI: a-piron.fr
     License: GPLv2
     */
-    // require_once(plugin_dir_path( __FILE__ ).'weatherIncController.php');
 
     $dir = plugin_dir_path( __FILE__ )."controllers";
     $list = array_diff(scandir($dir), array('..','.'));

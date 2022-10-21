@@ -35,7 +35,8 @@ class WeatherInc{
         }
     }
     public function uninit_weather_incModel(){
-        $query = $this->connect()->prepare('SELECT ID FROM plugin_posts WHERE post_title = ?');
+        require_once(ABSPATH . 'wp-config.php');
+        $query = $this->connect()->prepare('SELECT ID FROM '.$table_prefix.'posts WHERE post_title = ?');
         $query->execute(array('WheatherInc'));
         $toDel = $query->fetchAll();
         for ($i=0; $i < count($toDel); $i++) { 
@@ -71,5 +72,17 @@ class WeatherInc{
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         return curl_exec($curl);
         curl_close($curl);
+    }
+    public function apiKey($target){
+        require_once(ABSPATH . 'wp-config.php');
+        $query = $this->connect()->prepare('SELECT * FROM '.$table_prefix.'options WHERE option_value = ?');
+        $query->execute(array($target));
+        if (count($query->fetchAll())==0) {
+            $newApiKey = $this->connect()->prepare('INSERT INTO '.$table_prefix.' (option_name, option_value, autoload) VALUES(?,?,?)');
+            $newApiKey->execute(array('api_key_weather_inc',$target, 'yes'));
+        }
+    }
+    public function getExistentKey(){
+        
     }
 }
