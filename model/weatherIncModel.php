@@ -1,3 +1,8 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+</html>
 <?php 
 
 class WeatherInc{
@@ -28,10 +33,16 @@ class WeatherInc{
             ));
         }
         $this->createTable();
-        $results = json_decode($this->cURLCommunes(), true);
-        foreach ($results as $result) {
-            $query = $this->connect()->prepare('INSERT INTO communes (code, nom) VALUES (?,?)');
-            $query->execute(array($result['codesPostaux'][0], $result['nom']));
+        foreach ($this->cURLCommunes() as $result) {
+            if ($result['nom'] === "Paris") {
+                for ($i = 0; $i < count($result['codesPostaux']); $i++) { 
+                    $query = $this->connect()->prepare('INSERT INTO communes (code, nom) VALUES (?,?)');
+                    $query->execute(array($result['codesPostaux'][$i], $result['nom']));
+                }
+            }else{
+                $query = $this->connect()->prepare('INSERT INTO communes (code, nom) VALUES (?,?)');
+                $query->execute(array($result['codesPostaux'][0], $result['nom']));
+            }
         }
     }
     public function uninit_weather_incModel(){
@@ -61,7 +72,7 @@ class WeatherInc{
     }
     
     private function createTable(){
-        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6) AUTO_INCREMENT,shortcode VARCHAR(30),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6) AUTO_INCREMENT,code INT(6),nom VARCHAR(30),PRIMARY KEY(id));');
+        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6) AUTO_INCREMENT,shortcode VARCHAR(255),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6) AUTO_INCREMENT,code INT(6),nom VARCHAR(255),PRIMARY KEY(id));');
         $query->execute();
     }
     private function cURLCommunes(){
@@ -70,7 +81,9 @@ class WeatherInc{
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        return curl_exec($curl);
+        $toTransfert = curl_exec($curl);
+        mb_convert_encoding($toTransfert, 'ISO-8859-1', "UTF-8");
+        return json_decode($toTransfert, true);
         curl_close($curl);
     }
     public function apiKey($target){

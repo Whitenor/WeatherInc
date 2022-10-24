@@ -1,3 +1,8 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+</html>
 <?php 
     // require(plugin_dir_path( __FILE__ ).'../model/modelWeatherInc.php');
     $dir = plugin_dir_path( __FILE__ )."../model";
