@@ -31,12 +31,12 @@ class WeatherInc{
         $results = json_decode($this->cURLCommunes(), true);
         foreach ($results as $result) {
             $query = $this->connect()->prepare('INSERT INTO communes (code, nom) VALUES (?,?)');
-            $query->execute(array($result['code'], $result['nom']));
+            $query->execute(array($result['codesPostaux'][0], $result['nom']));
         }
     }
     public function uninit_weather_incModel(){
-        require_once(ABSPATH . 'wp-config.php');
-        $query = $this->connect()->prepare('SELECT ID FROM '.$table_prefix.'posts WHERE post_title = ?');
+        global $wpdb;
+        $query = $this->connect()->prepare('SELECT ID FROM '.$wpdb->prefix.'posts WHERE post_title = ?');
         $query->execute(array('WheatherInc'));
         $toDel = $query->fetchAll();
         for ($i=0; $i < count($toDel); $i++) { 
