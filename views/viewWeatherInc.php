@@ -12,15 +12,15 @@
 </form>
 
 <?php 
-function connect(){
-    require_once(ABSPATH . 'wp-config.php');
-    $sql = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME,DB_USER, DB_PASSWORD);
-    return $sql;
-}
-$query = connect()->prepare('SELECT * FROM communes where id = ?');
-$query->execute(array(1));
-$test = $query->fetchAll();
-var_dump($test);
+// function connect(){
+//     require_once(ABSPATH . 'wp-config.php');
+//     $sql = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME,DB_USER, DB_PASSWORD);
+//     return $sql;
+// }
+// $query = connect()->prepare('SELECT * FROM communes where id = ?');
+// $query->execute(array(1));
+// $test = $query->fetchAll();
+// var_dump(mb_convert_encoding($test, "UTF-8", 'ISO-8859-1'));
 ?>
 
 <script src="<?= WP_PLUGIN_URL.'/WeatherInc/app.js'?>"></script>

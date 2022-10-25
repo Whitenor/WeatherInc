@@ -14,3 +14,6 @@
     foreach ($list as $controller) {
         require_once(plugin_dir_path( __FILE__ ).'controllers/'.$controller);
     }
+    if (isset($_POST['apiKey'])) {
+        
+    }

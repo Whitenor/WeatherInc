@@ -1,7 +1,8 @@
 // let test = 'test';
 // console.log(test);
 
-document.querySelector('#apiKeyInput').addEventListener('change', function(e){
+document.querySelector('#shortcodeCityInput').addEventListener('change', function(e){
+    console.log('good');
     let toTransfert = new FormData();
     toTransfert.append('apiKey',e.value);
     newApiKey = new XMLHttpRequest();

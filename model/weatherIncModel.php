@@ -1,14 +1,9 @@
-<html>
-    <head>
-        <meta charset="UTF-8">
-    </head>
-</html>
 <?php 
 
 class WeatherInc{
     private function connect(){
         require_once(ABSPATH . 'wp-config.php');
-        $sql = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME,DB_USER, DB_PASSWORD);
+        $sql = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME,DB_USER, DB_PASSWORD, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
         return $sql;
     }
 
@@ -33,17 +28,25 @@ class WeatherInc{
             ));
         }
         $this->createTable();
+        global $wpdb;
+
+        $table_name = "communes";
+
+        $truncate = "TRUNCATE ".$table_name ;
+    
+        $wpdb->query($wpdb->prepare($truncate));
+
+        $arrayCommunes = array();
+        $place_holders = array(); 
+        $query = "INSERT INTO $table_name (code, nom) VALUES ";
         foreach ($this->cURLCommunes() as $result) {
-            if ($result['nom'] === "Paris") {
-                for ($i = 0; $i < count($result['codesPostaux']); $i++) { 
-                    $query = $this->connect()->prepare('INSERT INTO communes (code, nom) VALUES (?,?)');
-                    $query->execute(array($result['codesPostaux'][$i], $result['nom']));
-                }
-            }else{
-                $query = $this->connect()->prepare('INSERT INTO communes (code, nom) VALUES (?,?)');
-                $query->execute(array($result['codesPostaux'][0], $result['nom']));
+            foreach ($result['codesPostaux'] as $codePostal) {
+                array_push( $arrayCommunes, $codePostal, $result['nom']);
+                $place_holders[] = "(%s, %s)";
             }
         }
+        $query .= implode(', ', $place_holders);
+        $wpdb->query($wpdb->prepare("$query", $arrayCommunes));
     }
     public function uninit_weather_incModel(){
         global $wpdb;
@@ -70,32 +73,32 @@ class WeatherInc{
             return false;
         }
     }
-    
     private function createTable(){
-        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6) AUTO_INCREMENT,shortcode VARCHAR(255),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6) AUTO_INCREMENT,code INT(6),nom VARCHAR(255),PRIMARY KEY(id));');
+        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6) AUTO_INCREMENT,shortcode VARCHAR(30),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6) AUTO_INCREMENT,code INT(6),nom VARCHAR(45),PRIMARY KEY(id));');
         $query->execute();
     }
     private function cURLCommunes(){
-        $curl = curl_init();
-        $url = 'https://geo.api.gouv.fr/communes';
-        curl_setopt($curl, CURLOPT_URL, $url);
+
+        $curl = curl_init('https://geo.api.gouv.fr/communes');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         $toTransfert = curl_exec($curl);
         mb_convert_encoding($toTransfert, 'ISO-8859-1', "UTF-8");
-        return json_decode($toTransfert, true);
         curl_close($curl);
+        return json_decode($toTransfert, true);
     }
     public function apiKey($target){
-        require_once(ABSPATH . 'wp-config.php');
-        $query = $this->connect()->prepare('SELECT * FROM '.$table_prefix.'options WHERE option_value = ?');
+        global $wpdb;
+        $query = $this->connect()->prepare('SELECT * FROM '.$wpdb->prefix.'options WHERE option_value = ?');
         $query->execute(array($target));
         if (count($query->fetchAll())==0) {
-            $newApiKey = $this->connect()->prepare('INSERT INTO '.$table_prefix.' (option_name, option_value, autoload) VALUES(?,?,?)');
+            $newApiKey = $this->connect()->prepare('INSERT INTO '.$wpdb->prefix.'options (option_name, option_value, autoload) VALUES(?,?,?)');
             $newApiKey->execute(array('api_key_weather_inc',$target, 'yes'));
         }
     }
     public function getExistentKey(){
-        
+        global $wpdb;
+        $query = $this->connect()->prepare('SELECT * FROM '.$wpdb->prefix.'options WHERE option_value = ?');
+        $query->execute(array('api_key_weather_inc'));
     }
 }
