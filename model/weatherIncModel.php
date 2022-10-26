@@ -60,7 +60,6 @@ class WeatherInc{
         $query = $this->connect()->prepare('DROP TABLE communes, shortcode; ');
         $query->execute();
     }
-
     private function checkPageExistant(){
         $query = $this->connect()->prepare('SELECT * FROM plugin_posts WHERE post_title = WeatherInc');
         $query->execute();

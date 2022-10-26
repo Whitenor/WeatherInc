@@ -1,6 +1,6 @@
 <form class="apiKeyDiv" method="post">
     <p>Entrez votre clé api</p>
-    <input type="text" name="apiKeyInput" id="apiKeyInput">
+    <input type="text" name="apiKeyInput" id="apiKeyInput" value="<?php if ($toTransfert !== NULL && $toTransfert !=="") {echo $toTransfert;}?>" style="width:300px;" maxlength="32">
 </form>
 <form class="shortcode" method="post">
     <p>Entrez un nom de ville</p>
