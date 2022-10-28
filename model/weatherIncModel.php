@@ -6,7 +6,7 @@ class WeatherInc{
             $new_page = array(
                 'slug' => 'wheaterinc',
                 'title' => 'WheatherInc',
-                'content' => ""
+                'content' => "[test ville=Dole]"
             );
             wp_insert_post( array(
                 'post_title' => $new_page['title'],
@@ -76,19 +76,41 @@ class WeatherInc{
         curl_close($curl);
         return json_decode($toTransfert, true);
     }
+
+    public function getWeather($targetCity, $apiKey){
+        $curl = curl_init("https://api.openweathermap.org/data/2.5/weather?q=$targetCity&appid=$apiKey&units=metric");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $return = curl_exec($curl);
+        curl_close($curl);
+        return json_decode($return, true);
+    }
     public function setApiKey($target){
         global $wpdb;
-        $arrayForInsert= array("apiKey", $target, "yes") ;
-        $wpdb->get_results($wpdb->prepare("INSERT INTO ".$wpdb->prefix."options (option_name, option_value,autoload) VALUES (%s, %s, %s)", $arrayForInsert));
+        $arrayForInsert= array("apiKeyWeatherInc", $target, "yes") ;
+        $wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."options (option_name, option_value,autoload) VALUES (%s, %s, %s)", $arrayForInsert));
+        return $target;
+    }
+    public function setNewApiKey($target){
+        global $wpdb;
+        $arrayForUpdate = array($target);
+        $wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."options SET apiKeyWeatherInc = %s WHERE option_name = apiKeyWeatherInc", $arrayForUpdate));
         return $target;
     }
     public function getExistentKey(){
         global $wpdb;
-        $toCheck = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."options WHERE option_name = %s", "apiKey"));
+        $toCheck = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."options WHERE option_name = %s", "apiKeyWeatherInc"));
         return json_decode(json_encode($toCheck), true);
     }
     public function getCommunes(){
         global $wpdb;
         return $wpdb->get_results($wpdb->prepare("SELECT nom FROM communes;"));
+    }
+    public function setShortcode($target){
+        global $wpdb;
+        
+        $arrayForInsert = array($target);
+        $wpdb->query($wpdb->prepare("INSERT INTO shortcode (shortcode) VALUES (%s)", $arrayForInsert));
+        return $target;
     }
 }

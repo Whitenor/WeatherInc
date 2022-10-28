@@ -22,16 +22,23 @@
     </button>
     <input type="submit" value="Enregistrer la ville souhaitée" id="test">
 </form>
+
 <?php 
-$test3 = "Dole";
+$test3 = "Laons";
 $test4 = "bacd25324b846f4ee9568417943e5932";
 $test = curl_init("https://api.openweathermap.org/data/2.5/weather?q=$test3&appid=$test4&units=metric");
 curl_setopt($test, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($test, CURLOPT_SSL_VERIFYPEER, false);
 $test2 = json_decode(curl_exec($test),true);
 curl_close($test);
-echo '<pre>';
-var_dump($test2);
-echo '</pre>';
+
+$testForecast5 = curl_init("https://api.openweathermap.org/data/2.5/forecast?q=$test3&appid=$test4&units=metric");
+curl_setopt($testForecast5, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($testForecast5, CURLOPT_SSL_VERIFYPEER, false);
+$forecast5 = json_decode(curl_exec($testForecast5),true);
+curl_close($testForecast5);
+echo "<pre>";
+var_dump($forecast5['list'][0]);
+echo "</pre>";
 ?>
 <script src="<?= WP_PLUGIN_URL.'/WeatherInc/app.js'?>"></script>
