@@ -9,3 +9,7 @@
 //     newApiKey.open('GET',window.location.hostname+'/pluginTest/wp-content/plugins/WeatherInc/controllers/weatherIncController.php');
 //     newApiKey.send();
 // });
+document.querySelector('#copy').addEventListener('click', function(e){
+    e.preventDefault();
+    console.log('good')
+})

@@ -1,13 +1,6 @@
 <?php 
 
 class WeatherInc{
-    private function connect(){
-        require_once(ABSPATH . 'wp-config.php');
-        $sql = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME,DB_USER, DB_PASSWORD, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
-        return $sql;
-    }
-
-
     public function init_weather_incModel(){
         if ($this->checkPageExistant() == false) {
             $new_page = array(
@@ -50,20 +43,16 @@ class WeatherInc{
     }
     public function uninit_weather_incModel(){
         global $wpdb;
-        $query = $this->connect()->prepare('SELECT ID FROM '.$wpdb->prefix.'posts WHERE post_title = ?');
-        $query->execute(array('WheatherInc'));
-        $toDel = $query->fetchAll();
+        $toDel = json_decode(json_encode($wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->prefix."posts WHERE post_title = %s", array('WheatherInc')))),true);
         for ($i=0; $i < count($toDel); $i++) { 
             wp_delete_post($toDel[$i]['ID'] , true);
         };
 
-        $query = $this->connect()->prepare('DROP TABLE communes, shortcode; ');
-        $query->execute();
+        $wpdb->query($wpdb->prepare('DROP TABLE communes, shortcode; '));
     }
     private function checkPageExistant(){
-        $query = $this->connect()->prepare('SELECT * FROM plugin_posts WHERE post_title = WeatherInc');
-        $query->execute();
-        $toCheck = $query->fetchAll();
+        global $wpdb;
+        $toCheck = json_decode(json_encode($wpdb->get_results($wpdb->prepare("SELECT * FROM plugin_posts WHERE post_title = %s", array('WeatherInc')))),true);
         $check = count($toCheck);
         if ($check > 0) {
             return true;
@@ -73,8 +62,9 @@ class WeatherInc{
         }
     }
     private function createTable(){
-        $query = $this->connect()->prepare('CREATE TABLE shortcode(ID INT(6) AUTO_INCREMENT,shortcode VARCHAR(30),PRIMARY KEY(ID)); CREATE TABLE communes(id INT(6) AUTO_INCREMENT,code INT(6),nom VARCHAR(45),PRIMARY KEY(id));');
-        $query->execute();
+        global $wpdb;
+        $wpdb->query($wpdb->prepare("CREATE TABLE shortcode(ID INT(6) AUTO_INCREMENT,shortcode VARCHAR(45),PRIMARY KEY(ID))"));
+        $wpdb->query($wpdb->prepare("CREATE TABLE communes(id INT(6) AUTO_INCREMENT,code INT(6),nom VARCHAR(45),PRIMARY KEY(id));"));
     }
     private function cURLCommunes(){
 
@@ -86,18 +76,19 @@ class WeatherInc{
         curl_close($curl);
         return json_decode($toTransfert, true);
     }
-    public function apiKey($target){
+    public function setApiKey($target){
         global $wpdb;
-        $query = $this->connect()->prepare('SELECT * FROM '.$wpdb->prefix.'options WHERE option_value = ?');
-        $query->execute(array($target));
-        if (count($query->fetchAll())==0) {
-            $newApiKey = $this->connect()->prepare('INSERT INTO '.$wpdb->prefix.'options (option_name, option_value, autoload) VALUES(?,?,?)');
-            $newApiKey->execute(array('api_key_weather_inc',$target, 'yes'));
-        }
+        $arrayForInsert= array("apiKey", $target, "yes") ;
+        $wpdb->get_results($wpdb->prepare("INSERT INTO ".$wpdb->prefix."options (option_name, option_value,autoload) VALUES (%s, %s, %s)", $arrayForInsert));
+        return $target;
     }
     public function getExistentKey(){
         global $wpdb;
-        $query = $this->connect()->prepare('SELECT * FROM '.$wpdb->prefix.'options WHERE option_value = ?');
-        $query->execute(array('api_key_weather_inc'));
+        $toCheck = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."options WHERE option_name = %s", "apiKey"));
+        return json_decode(json_encode($toCheck), true);
+    }
+    public function getCommunes(){
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare("SELECT nom FROM communes;"));
     }
 }

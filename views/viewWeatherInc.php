@@ -1,26 +1,37 @@
 <form class="apiKeyDiv" method="post">
     <p>Entrez votre clé api</p>
-    <input type="text" name="apiKeyInput" id="apiKeyInput" value="<?php if ($toTransfert !== NULL && $toTransfert !=="") {echo $toTransfert;}?>" style="width:300px;" maxlength="32">
+    <?php 
+    if ($messageApi == true) {
+        echo '<p>Pensez à vous créer un compte pour récupérer une clé API <a href="https://openweathermap.org">ici</a> pour ensuite l\'ajouter ici</p>';
+    }
+    ?>
+    <input type="text" name="apiKeyInput" id="apiKeyInput" value="<?php if ($apiKeyToTransfert !== NULL && $apiKeyToTransfert !=="") {echo $apiKeyToTransfert;}?>" style="width:300px;" maxlength="32" autocomplete="off">
+    <input type="submit" value="Enregister / mettre à jour">
 </form>
 <form class="shortcode" method="post">
     <p>Entrez un nom de ville</p>
-    <input type="text" name="shortcodeCityInput" id="shortcodeCityInput">
+    <input list="communes" name="shortcodeCityInput" id="shortcodeCityInput" autocomplete="off">
+    <datalist id="communes">
+        <?php foreach ($communesTransfert as $commune) {
+            echo '<option value="'.$commune['nom'].'">'.$commune['nom'].'</option>';
+        } ?>
+    </datalist>
     <input type="text" name="shortcodeCityOutput" id="shortcodeCityOutput" disabled>
     <button id="copy">
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M8 4v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.242a2 2 0 0 0-.602-1.43L16.083 2.57A2 2 0 0 0 14.685 2H10a2 2 0 0 0-2 2Z"/><path d="M16 18v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2"/></g></svg>
     </button>
+    <input type="submit" value="Enregistrer la ville souhaitée" id="test">
 </form>
-
 <?php 
-// function connect(){
-//     require_once(ABSPATH . 'wp-config.php');
-//     $sql = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME,DB_USER, DB_PASSWORD);
-//     return $sql;
-// }
-// $query = connect()->prepare('SELECT * FROM communes where id = ?');
-// $query->execute(array(1));
-// $test = $query->fetchAll();
-// var_dump(mb_convert_encoding($test, "UTF-8", 'ISO-8859-1'));
+$test3 = "Dole";
+$test4 = "bacd25324b846f4ee9568417943e5932";
+$test = curl_init("https://api.openweathermap.org/data/2.5/weather?q=$test3&appid=$test4&units=metric");
+curl_setopt($test, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($test, CURLOPT_SSL_VERIFYPEER, false);
+$test2 = json_decode(curl_exec($test),true);
+curl_close($test);
+echo '<pre>';
+var_dump($test2);
+echo '</pre>';
 ?>
-
 <script src="<?= WP_PLUGIN_URL.'/WeatherInc/app.js'?>"></script>
