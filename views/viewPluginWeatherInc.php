@@ -33,14 +33,14 @@
 
         <details class="card WeatherNow">
             <summary class="summaryWeather">
-                <img src="http://openweathermap.org/img/wn/<?= $test2['weather'][0]['icon']?>.png" alt="">
-                <h3><?= $test2['name']?></h3>
+                <img src="http://openweathermap.org/img/wn/<?= $resultNow['weather'][0]['icon']?>.png" alt="">
+                <h3><?= $city['city']?></h3>
                 <p>Cliquez pour plus d'infos</p>
             </summary>
             <div class="moreInfo">
-                <p><?= $test2['main']['temp']?>°C actuellement</p>
-                <p><?= $test2['main']['feels_like']?>°C ressenti</p>
-                <p>Vitesse du vent: <?= $test2['wind']['speed']?>km/h</p>
+                <p><?= $resultNow['main']['temp']?>°C actuellement</p>
+                <p><?= $resultNow['main']['feels_like']?>°C ressenti</p>
+                <p>Vitesse du vent: <?= $resultNow['wind']['speed']?>km/h</p>
             </div>
         </details>
 
@@ -58,4 +58,10 @@
 
 <?php 
 
+echo '<pre>';
+// var_dump($key);
+// var_dump($city);
+var_dump($key[0]['option_value']);
+var_dump($result5Day);
+echo '</pre>';
 $viewPluginWeatherInc = ob_get_clean();

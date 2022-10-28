@@ -17,37 +17,37 @@
         add_menu_page( 'WeatherInc', 'Administration de WeatherInc', 'manage_options', 'WeatherIncAdmin', 'thePage', 'dashicons-cloud' );
     }
     function thePage(){
-        $checkKey = new WeatherInc;
-        $resultCheck = $checkKey->getExistentKey();
-        if (count($resultCheck) > 0 ) {
-            $apiKeyToTransfert = $resultCheck[0]['option_value'];
-        }elseif (isset($_POST['apiKeyInput']) && !empty($_POST['apiKeyInput']) && $_POST['apiKeyInput'] == $_POST['apiKeyInput']){
-            $insertKey = new WeatherInc;
-            $apiKeyToTransfert = $insertKey->setApiKey($_POST['apiKeyInput']);
-        }elseif(isset($_POST['apiKeyInput']) && !empty($_POST['apiKeyInput']) && $_POST['apiKeyInput'] != $_POST['apiKeyInput']){
-            $updateKey = new WeatherInc;
-            $apiKeyToTransfert = $updateKey->setNewApiKey($_POST['apiKeyInput']);
+        $weatherInc = new WeatherInc;
+        $resultCheck = $weatherInc->getExistentKey();
+        if (isset($_POST['apiKeyInput']) && !empty($_POST['apiKeyInput']) && $_POST['apiKeyInput'] == $resultCheck[0]['option_value']){
+            $apiKeyToTransfert = $weatherInc->setApiKey($_POST['apiKeyInput']);
+        }elseif(isset($_POST['apiKeyInput']) && !empty($_POST['apiKeyInput']) && $_POST['apiKeyInput'] != $resultCheck[0]['option_value']){
+            $apiKeyToTransfert = $weatherInc->setNewApiKey($_POST['apiKeyInput']);
         }else{
             $messageApi = true;
         }
         if (isset($_POST['shortcodeCityInput']) && !empty($_POST['shortcodeCityInput'])) {
-            $newShortcode = new WeatherInc;
-            $shortcodeToTransfert = $newShortcode->setShortcode($_POST['shortcodeCityInput']);
+            $shortcodeToTransfert = $weatherInc->setShortcode($_POST['shortcodeCityInput']);
+            $shortcodeToTransfert = $_POST['shortcodeCityInput'];
         }
-        $communes = new WeatherInc;
-        $communesTransfert = json_decode(json_encode($communes->getCommunes()),true);
+        $listShortcode = json_decode(json_encode($weatherInc->getShortcode()),true);
+        $shortcodeToTransfert = $listShortcode[0]['shortcode'];
+        $communesTransfert = json_decode(json_encode($weatherInc->getCommunes()),true);
         require(plugin_dir_path( __FILE__ )."../views/viewWeatherInc.php");
         // require(plugin_dir_path( __FILE__ )."../views/viewPluginWeatherInc.php");
     }
     function shortcodeWeatherInc($atts){
         $getWeather = new WeatherInc;
         $key = $getWeather->getExistentKey();
-        
-        return $atts['ville'];
+        $city = $atts;
+        $resultNow = $getWeather->getWeather($city['city'], $key[0]['option_value']);
+        $result5Day= $getWeather->getWeather5Day($city['city'], $key[0]['option_value']);
+        require_once(plugin_dir_path( __FILE__ )."../views/viewPluginWeatherInc.php");
+        return $viewPluginWeatherInc;
     }
     add_action('activated_plugin', 'init_weather_inc');
     add_action('admin_menu', 'newAdminPage');
     add_action('deactivate_plugin', 'uninit_weather_inc');
     
     
-    // add_shortcode('meteo', 'shortcodeWeatherInc');
+    add_shortcode('meteo', 'shortcodeWeatherInc');  

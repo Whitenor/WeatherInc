@@ -76,7 +76,11 @@ class WeatherInc{
         curl_close($curl);
         return json_decode($toTransfert, true);
     }
-
+    public function getShortcode(){
+        global $wpdb;
+        $toReturn = $wpdb->get_results($wpdb->prepare("SELECT * FROM shortcode"));
+        return json_decode(json_encode($toReturn), true);
+    }
     public function getWeather($targetCity, $apiKey){
         $curl = curl_init("https://api.openweathermap.org/data/2.5/weather?q=$targetCity&appid=$apiKey&units=metric");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -84,6 +88,13 @@ class WeatherInc{
         $return = curl_exec($curl);
         curl_close($curl);
         return json_decode($return, true);
+    }
+    public function getWeather5Day($targetCity, $apiKey){
+        $curl = curl_init("https://api.openweathermap.org/data/2.5/forecast?q=$targetCity&appid=$apiKey&units=metric");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        return json_decode(curl_exec($curl),true);
+        curl_close($curl);
     }
     public function setApiKey($target){
         global $wpdb;
@@ -108,9 +119,13 @@ class WeatherInc{
     }
     public function setShortcode($target){
         global $wpdb;
-        
         $arrayForInsert = array($target);
-        $wpdb->query($wpdb->prepare("INSERT INTO shortcode (shortcode) VALUES (%s)", $arrayForInsert));
+        $toCheck = $this-> getShortcode();
+        if (count($toCheck)>0) {
+            $wpdb->query($wpdb->prepare("UPDATE shortcode SET shortcode = %s WHERE ID = 1", $arrayForInsert));
+        }else{
+            $wpdb->query($wpdb->prepare("INSERT INTO shortcode (shortcode) VALUES (%s)", $arrayForInsert));
+        }
         return $target;
     }
 }
